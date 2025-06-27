@@ -1,0 +1,13 @@
+flask
+slack_sdk
+python-dotenv
+requests
+langchain
+ollama
+faiss-cpu
+unstructured
+python-docx
+langchain-community
+langchain-ollama
+openai
+langchain-openai
