@@ -13,7 +13,7 @@ from langchain_community.embeddings import OllamaEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.docstore.document import Document
 from langchain_openai import ChatOpenAI
-from langchain.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 
@@ -45,8 +45,8 @@ llm = ChatOpenAI(
     model="mistralai/mistral-7b-instruct" # or "meta-llama/llama-3-70b-instruct", etc.
 )
 
-loader1 = PyPDFLoader("/handbook.pdf")
-loader2 = PyPDFLoader("/retirement.pdf")
+loader1 = PyPDFLoader("handbook.pdf")
+loader2 = PyPDFLoader("retirement.pdf")
 
 docs1 = loader1.load()
 docs2 = loader2.load()
