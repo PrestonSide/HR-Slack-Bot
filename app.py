@@ -24,8 +24,6 @@ import re
 
 slack_token = os.environ["SLACK_BOT_TOKEN"]
 signing_secret = os.environ["SLACK_SIGNING_SECRET"]
-authorized_user = os.environ["AUTHORIZED_USER_ID"]
-copilot_token = os.environ["COPILOT_BOT_SECRET"]
 openrouter_key = os.environ["OPENROUTER_API_KEY"]
 
 load_dotenv()
