@@ -63,12 +63,12 @@ llm = ChatOpenAI(
 @app.route("/ask_llama", methods=["POST"])
 def ask_llama():
     user_input = request.json.get("question")
-    #debug_log(f"User Input: {user_input}")
+    debug_log(f"User Input: {user_input}")
     if not user_input:
         return jsonify({"error": "Missing 'question' in request"}), 400
 
     answer = llm.invoke(user_input)
-    #debug_log(f"AI Answer: {answer}")
+    debug_log(f"AI Answer: {answer}")
     return jsonify({"answer": str(answer.content if hasattr(answer, "content") else answer)})
 
 ## Post method responses ##
@@ -83,7 +83,7 @@ def slack_events():
     else:
         payload = request.json
 
-    #debug_log(f"Incoming payload: {payload}")
+    debug_log(f"Incoming payload: {payload}")
     if payload.get("type") == "url_verification":
         return jsonify({"challenge": payload["challenge"]}), 200
 
@@ -126,7 +126,7 @@ def handle_event(event):
         text = event.get("text")
         channel = event.get("channel")
 
-        #debug_log(f"DM: {text}")
+        debug_log(f"DM: {text}")
         #Change
         response = requests.post("https://hr-slack-bot.onrender.com/ask_llama", json={"question": text})
         llama_answer = response.json().get("answer", "Sorry, I couldn't find an answer.")
