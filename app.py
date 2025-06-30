@@ -46,7 +46,8 @@ qa_chain = None
 def get_qa_chain():
     global qa_chain
     if qa_chain is None:
-        print("⏳ Building vectorstore...")
+        debug_log("⏳Building vectorstore")
+        
 
         loader1 = PyPDFLoader("handbook.pdf")
         loader2 = PyPDFLoader("retirement.pdf")
@@ -69,7 +70,7 @@ def get_qa_chain():
             retriever=vectorstore.as_retriever(),
             return_source_documents=False
         )
-
+    debug_log("Done Building")
     return qa_chain
 
 ## LLama Post Method ##
@@ -77,13 +78,13 @@ def get_qa_chain():
 def ask_llama():
     global qa_chain
     user_input = request.json.get("question")
-    #debug_log(f"User Input: {user_input}")
+    debug_log(f"Ask AI: {user_input}")
     if not user_input:
         return jsonify({"error": "Missing 'question' in request"}), 400
 
     chain = get_qa_chain()
     answer = chain.run(user_input)
-    print(answer)
+    debug_log(f"ai answer: {answer}")
     #debug_log(f"AI Answer: {answer}")
     return jsonify({"answer": str(answer.content if hasattr(answer, "content") else answer)})
 
