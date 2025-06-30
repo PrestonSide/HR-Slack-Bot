@@ -8,3 +8,6 @@ unstructured
 python-docx
 langchain-community
 openai
+langchain-openai
+# sentence-transformers
+# langchain-huggingface
