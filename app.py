@@ -22,11 +22,13 @@ import json
 import threading
 import re
 
+load_dotenv()
+
 slack_token = os.environ["SLACK_BOT_TOKEN"]
 signing_secret = os.environ["SLACK_SIGNING_SECRET"]
 openrouter_key = os.environ["OPENROUTER_API_KEY"]
 
-load_dotenv()
+
 
 app = Flask(__name__)
 conversations = {}
