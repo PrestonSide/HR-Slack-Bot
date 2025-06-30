@@ -81,7 +81,7 @@ def slack_events():
     else:
         payload = request.json
 
-    #debug_log(f"Incoming payload: {payload}")
+    debug_log(f"Incoming payload: {payload}")
     if payload.get("type") == "url_verification":
         return jsonify({"challenge": payload["challenge"]}), 200
 
@@ -113,8 +113,7 @@ def handle_event(event):
         #debug_log(f"BOT EVENT: {event}")
         return "", 200
         
-    #debug_log(f"Slack Event: {event}")
-    #debug_log(event)
+    debug_log(f"Slack Event: {event}")
     ##If Bot is Opened ##
     # if event.get("type") == "app_home_opened":
     #     user_id = event.get("user")
@@ -125,7 +124,7 @@ def handle_event(event):
         text = event.get("text")
         channel = event.get("channel")
 
-        #debug_log(f"DM from {user} with Email {email}: {text}")
+        debug_log(f"DM from {user} with Email {email}: {text}")
         #Change
         response = requests.post("https://hr-slack-bot.onrender.com/ask_llama", json={"question": text})
         llama_answer = response.json().get("answer", "Sorry, I couldn't find an answer.")
