@@ -6,12 +6,9 @@ from slack_sdk.errors import SlackApiError
 from slack_sdk.signature import SignatureVerifier
 
 ## LLaMa 3 Imports ##
-from langchain_ollama import OllamaLLM
 from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import OllamaEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.docstore.document import Document
 from langchain_openai import ChatOpenAI
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_huggingface import HuggingFaceEmbeddings
