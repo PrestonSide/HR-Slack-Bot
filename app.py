@@ -36,25 +36,27 @@ verifier = SignatureVerifier(signing_secret=signing_secret)
 
 
 ## Doc Retrieval ##
+
+
+loader1 = PyPDFLoader("handbook.pdf")
+loader2 = PyPDFLoader("retirement.pdf")
+
+docs1 = loader1.load()
+docs2 = loader2.load()
+docs = docs1 + docs2
+
+splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+texts = splitter.split_documents(docs)
+
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+vectorstore = FAISS.from_documents(texts, embeddings)
+
 llm = ChatOpenAI(
-    base_url="https://openrouter.ai/api/v1", 
-    openai_api_key= openrouter_key,  # from openrouter.ai/keys
-    model="mistralai/mistral-7b-instruct" # or "meta-llama/llama-3-70b-instruct", etc.
-)
-
-#loader1 = PyPDFLoader("handbook.pdf")
-#loader2 = PyPDFLoader("retirement.pdf")
-
-# docs1 = loader1.load()
-# docs2 = loader2.load()
-# docs = docs1 + docs2
-
-# splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-# texts = splitter.split_documents(docs)
-
-# embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-# vectorstore = FAISS.from_documents(texts, embeddings)
-# qa_chain = RetrievalQA.from_chain_type(llm=llm, retriever=vectorstore.as_retriever(), return_source_documents=False)
+        base_url="https://openrouter.ai/api/v1", 
+        openai_api_key= openrouter_key,  # from openrouter.ai/keys
+        model="mistralai/mistral-7b-instruct" # or "meta-llama/llama-3-70b-instruct", etc.
+    )
+qa_chain = RetrievalQA.from_chain_type(llm=llm, retriever=vectorstore.as_retriever(), return_source_documents=False)
 
 
 
@@ -62,14 +64,18 @@ llm = ChatOpenAI(
 ## LLama Post Method ##
 @app.route("/ask_llama", methods=["POST"])
 def ask_llama():
+    global vectorstore
+    global qa_chain
+    global llm
     user_input = request.json.get("question")
     #debug_log(f"User Input: {user_input}")
     if not user_input:
         return jsonify({"error": "Missing 'question' in request"}), 400
 
-    answer = llm.invoke(user_input)
+    answer = qa_chain.run(user_input)
+    print(answer)
     #debug_log(f"AI Answer: {answer}")
-    return jsonify({"answer": str(answer.content if hasattr(answer, "content") else answer)})
+    return answer #jsonify({"answer": str(answer.content if hasattr(answer, "content") else answer)})
 
 ## Post method responses ##
 @app.route("/slack/events", methods=["POST"])
