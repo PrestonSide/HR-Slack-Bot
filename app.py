@@ -124,7 +124,7 @@ def handle_event(event):
         text = event.get("text")
         channel = event.get("channel")
 
-        debug_log(f"DM from {user} with Email {email}: {text}")
+        debug_log(f"DM: {text}")
         #Change
         response = requests.post("https://hr-slack-bot.onrender.com/ask_llama", json={"question": text})
         llama_answer = response.json().get("answer", "Sorry, I couldn't find an answer.")
