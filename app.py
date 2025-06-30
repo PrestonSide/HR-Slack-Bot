@@ -63,10 +63,12 @@ llm = ChatOpenAI(
 @app.route("/ask_llama", methods=["POST"])
 def ask_llama():
     user_input = request.json.get("question")
+    debug_log(f"User Input: {user_input}")
     if not user_input:
         return jsonify({"error": "Missing 'question' in request"}), 400
 
     answer = llm.invoke(user_input)
+    debug_log(f"AI Answer: {answer}")
     return jsonify({"answer": str(answer.content if hasattr(answer, "content") else answer)})
 
 ## Post method responses ##
