@@ -3,11 +3,11 @@ slack_sdk
 python-dotenv
 requests
 langchain
-faiss-cpu
+#faiss-cpu
 unstructured
 python-docx
 langchain-community
 openai
 langchain-openai
-sentence-transformers
-langchain-huggingface
+# sentence-transformers
+# langchain-huggingface

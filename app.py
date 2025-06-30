@@ -6,12 +6,13 @@ from slack_sdk.errors import SlackApiError
 from slack_sdk.signature import SignatureVerifier
 
 ## LLaMa 3 Imports ##
-from langchain.chains import RetrievalQA
-from langchain_community.vectorstores import FAISS
-from langchain.text_splitter import CharacterTextSplitter
+#from langchain.chains import RetrievalQA
+#from langchain_community.vectorstores import FAISS
+#from langchain.text_splitter import CharacterTextSplitter
 from langchain_openai import ChatOpenAI
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_huggingface import HuggingFaceEmbeddings
+# from langchain_community.document_loaders import PyPDFLoader
+# from langchain_huggingface import HuggingFaceEmbeddings
+import pdfplumber
 
 
 import os
@@ -36,54 +37,77 @@ conversations = {}
 client = WebClient(token=slack_token)
 verifier = SignatureVerifier(signing_secret=signing_secret)
 
-
-## Doc Retrieval ##
-
-
-
-qa_chain = None
-
-def get_qa_chain():
-    global qa_chain
-    if qa_chain is None:
-        debug_log("⏳Building vectorstore")
-        
-
-        loader1 = PyPDFLoader("handbook.pdf")
-        loader2 = PyPDFLoader("retirement.pdf")
-
-        docs = loader1.load() + loader2.load()
-        splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-        texts = splitter.split_documents(docs)
-
-        embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-        vectorstore = FAISS.from_documents(texts, embeddings)
-
-        llm = ChatOpenAI(
+llm = ChatOpenAI(
             base_url="https://openrouter.ai/api/v1",
             openai_api_key=openrouter_key,
             model="mistralai/mistral-7b-instruct"
         )
+## Doc Retrieval ##
 
-        qa_chain = RetrievalQA.from_chain_type(
-            llm=llm,
-            retriever=vectorstore.as_retriever(),
-            return_source_documents=False
-        )
-    debug_log("Done Building")
-    return qa_chain
+
+
+# qa_chain = None
+
+# def get_qa_chain():
+#     global qa_chain
+#     if qa_chain is None:
+#         debug_log("⏳Building vectorstore")
+        
+
+#         loader1 = PyPDFLoader("handbook.pdf")
+#         loader2 = PyPDFLoader("retirement.pdf")
+
+#         docs = loader1.load() + loader2.load()
+#         splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+#         texts = splitter.split_documents(docs)
+
+#         embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+#         vectorstore = FAISS.from_documents(texts, embeddings)
+
+#         llm = ChatOpenAI(
+#             base_url="https://openrouter.ai/api/v1",
+#             openai_api_key=openrouter_key,
+#             model="mistralai/mistral-7b-instruct"
+#         )
+
+#         qa_chain = RetrievalQA.from_chain_type(
+#             llm=llm,
+#             retriever=vectorstore.as_retriever(),
+#             return_source_documents=False
+#         )
+#     debug_log("Done Building")
+#     return qa_chain
+
+def extract_text_from_pdf(path):
+    try:
+        text = ""
+        with pdfplumber.open(path) as pdf:
+            for page in pdf.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+        print(f"Loaded In {path}")
+        return text
+    except Exception as e:
+        print(f"Error reading PDF {path}: {e}")
+        return ""
+    
+pdf1 = extract_text_from_pdf("handbook.pdf")
+pdf2 = extract_text_from_pdf("retirement.pdf")
+pdf_text = pdf1 + pdf2
 
 ## LLama Post Method ##
 @app.route("/ask_llama", methods=["POST"])
 def ask_llama():
-    global qa_chain
+    global pdf_text
+    global llm
     user_input = request.json.get("question")
     debug_log(f"Ask AI: {user_input}")
     if not user_input:
         return jsonify({"error": "Missing 'question' in request"}), 400
 
-    chain = get_qa_chain()
-    answer = chain.run(user_input)
+    ai_input = f"Using the following info: {pdf_text}. Answer this prompt: {user_input}"
+    answer = llm.invoke(ai_input)
     debug_log(f"ai answer: {answer}")
     #debug_log(f"AI Answer: {answer}")
     return jsonify({"answer": str(answer.content if hasattr(answer, "content") else answer)})
