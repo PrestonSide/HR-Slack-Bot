@@ -178,8 +178,9 @@ def handle_event(event):
         debug_log(f"Direct Line Token: {directline_token}")
         debug_log(f"Conversation Id: {conversation_id}")
         start_copilot_conversation(directline_token)
-        debug_log(send_copilot_message(text, conversation_id, directline_token, user))
-        debug_log(f"Copilot Message: {get_copilot_response(conversation_id, directline_token)}")
+        send_message = send_copilot_message(text, conversation_id, directline_token, user)
+        debug_log(send_message)
+        debug_log(f"Copilot Message: {get_copilot_response(send_message["conversationId"], send_message["token"])}")
         llama_answer = response.json().get("answer", "Sorry, I couldn't find an answer.")
         
         send_slack_message(channel, llama_answer)
