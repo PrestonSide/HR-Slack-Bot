@@ -177,6 +177,7 @@ def handle_event(event):
         conversation_id = directline["conversationId"]
         debug_log(f"Direct Line Token: {directline_token}")
         debug_log(f"Conversation Id: {conversation_id}")
+        start_copilot_conversation(directline_token)
         debug_log(send_copilot_message(text, conversation_id, directline_token, user))
         llama_answer = response.json().get("answer", "Sorry, I couldn't find an answer.")
         
@@ -209,6 +210,15 @@ def get_directline_token():
     
     response = requests.get(token_url)
     return response.json()
+
+def start_copilot_conversation(token):
+    url = "https://directline.botframework.com/v3/directline/conversations"
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    #response = requests.post(url, headers=headers)
+    #return response.json()
+    requests.post(url, headers=headers)
 
 def send_copilot_message(text, conversation_id, token, user):
     url = f"https://directline.botframework.com/v3/directline/conversations/{conversation_id}/activities"
