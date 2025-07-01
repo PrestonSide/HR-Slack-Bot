@@ -12,7 +12,7 @@ from slack_sdk.signature import SignatureVerifier
 from langchain_openai import ChatOpenAI
 # from langchain_community.document_loaders import PyPDFLoader
 # from langchain_huggingface import HuggingFaceEmbeddings
-import pdfplumber
+#import pdfplumber
 
 
 import os
@@ -78,36 +78,37 @@ llm = ChatOpenAI(
 #     debug_log("Done Building")
 #     return qa_chain
 
-def extract_text_from_pdf(path):
-    try:
-        text = ""
-        with pdfplumber.open(path) as pdf:
-            for page in pdf.pages:
-                page_text = page.extract_text()
-                if page_text:
-                    text += page_text + "\n"
-        print(f"Loaded In {path}")
-        return text
-    except Exception as e:
-        print(f"Error reading PDF {path}: {e}")
-        return ""
+# def extract_text_from_pdf(path):
+#     try:
+#         text = ""
+#         with pdfplumber.open(path) as pdf:
+#             for page in pdf.pages:
+#                 page_text = page.extract_text()
+#                 if page_text:
+#                     text += page_text + "\n"
+#         print(f"Loaded In {path}")
+#         return text
+#     except Exception as e:
+#         print(f"Error reading PDF {path}: {e}")
+#         return ""
     
-pdf1 = extract_text_from_pdf("handbook.pdf")
-pdf2 = extract_text_from_pdf("retirement.pdf")
-pdf_text = pdf1 + pdf2
+
 
 ## LLama Post Method ##
 @app.route("/ask_llama", methods=["POST"])
 def ask_llama():
-    global pdf_text
     global llm
+    # pdf1 = extract_text_from_pdf("handbook.pdf")
+    #pdf2 = extract_text_from_pdf("retirement.pdf")
+    #pdf_text = pdf2
     user_input = request.json.get("question")
     debug_log(f"Ask AI: {user_input}")
     if not user_input:
         return jsonify({"error": "Missing 'question' in request"}), 400
 
-    ai_input = f"Using the following info: {pdf_text}. Answer this prompt: {user_input}"
-    answer = llm.invoke(ai_input)
+    #ai_input = f"Using the following info: {pdf_text}. Answer this prompt: {user_input}"
+    #debug_log(ai_input)
+    answer = llm.invoke(user_input)
     debug_log(f"ai answer: {answer}")
     #debug_log(f"AI Answer: {answer}")
     return jsonify({"answer": str(answer.content if hasattr(answer, "content") else answer)})
@@ -170,7 +171,9 @@ def handle_event(event):
         #debug_log(f"DM: {text}")
         #Change
         response = requests.post("https://hr-slack-bot.onrender.com/ask_llama", json={"question": text})
+        debug_log(get_directline_token())
         llama_answer = response.json().get("answer", "Sorry, I couldn't find an answer.")
+        
         send_slack_message(channel, llama_answer)
                 
             
@@ -194,6 +197,12 @@ def send_slack_message(channel, text):
         "text": text
     }
     requests.post("https://slack.com/api/chat.postMessage", headers=headers, json=data)
+
+def get_directline_token():
+    token_url = "https://defaultceaebaaed1ed4b91aa8383683a9425.13.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr552_hrAssistantSlack/directline/token?api-version=2022-03-01-preview"
+    
+    response = requests.get(token_url)
+    return response.json()["access_token"]
 
 
 # ## Home Menu Display ##

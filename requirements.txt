@@ -11,4 +11,4 @@ openai
 langchain-openai
 # sentence-transformers
 # langchain-huggingface
-pdfplumber
+#pdfplumber
