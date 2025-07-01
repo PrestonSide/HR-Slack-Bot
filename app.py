@@ -222,9 +222,9 @@ def start_copilot_conversation(token):
     requests.post(url, headers=headers)
 
 def send_copilot_message(text, conversation_id, token, user):
-    url = f"https://directline.botframework.com/v3/directline/conversations/{conversation_id}/activities"
+    url = f"https://directline.botframework.com/v3/directline/conversations"
     headers = {
-        "Authorization": f"Bearer {token}",
+        "Authorization": f"Bearer 2QghxPX1vqvEGcQMHjy9H0iQUWlHxPwa3tCtu28nXGYmfYt98MWUJQQJ99BFACYeBjFAArohAAABAZBS2Bhw.B9xEX81xDLMgHUBYMyAuEAhMnQwgAF1Dj4UAUCJRxpGpDJaMqOBzJQQJ99BFACYeBjFAArohAAABAZBSqq6Z",
         "Content-Type": "application/json"
     }
     data = {
