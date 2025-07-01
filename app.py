@@ -167,11 +167,17 @@ def handle_event(event):
     if event.get("type") == "message" and event.get("channel_type") == "im":
         text = event.get("text")
         channel = event.get("channel")
+        user = event.get("user")
 
         #debug_log(f"DM: {text}")
         #Change
         response = requests.post("https://hr-slack-bot.onrender.com/ask_llama", json={"question": text})
-        debug_log(get_directline_token())
+        directline = get_directline_token()
+        directline_token = directline["token"]
+        conversation_id = directline["conversationId"]
+        debug_log(f"Direct Line Token: {directline_token}")
+        debug_log(f"Conversation Id: {conversation_id}")
+        debug_log(send_copilot_message(text, conversation_id, directline_token, user))
         llama_answer = response.json().get("answer", "Sorry, I couldn't find an answer.")
         
         send_slack_message(channel, llama_answer)
@@ -203,6 +209,25 @@ def get_directline_token():
     
     response = requests.get(token_url)
     return response.json()
+
+def send_copilot_message(text, conversation_id, token, user):
+    url = f"https://directline.botframework.com/v3/directline/conversations/{conversation_id}/activities"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "locale": "en-EN",
+        "type": "message",
+        "from": {
+            "id": user
+        },
+        "text": text
+    }
+    response = requests.post(url, headers=headers, json=data)
+    return response.json()
+
+
 
 
 # ## Home Menu Display ##
