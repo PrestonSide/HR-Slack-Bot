@@ -28,6 +28,7 @@ load_dotenv()
 slack_token = os.environ["SLACK_BOT_TOKEN"]
 signing_secret = os.environ["SLACK_SIGNING_SECRET"]
 openrouter_key = os.environ["OPENROUTER_API_KEY"]
+directline_token = os.environ["DIRECTLINE_TOKEN"]
 
 
 
@@ -225,7 +226,7 @@ def start_copilot_conversation(token):
 def send_copilot_message(text, conversation_id, token, user):
     url = f"https://directline.botframework.com/v3/directline/conversations"
     headers = {
-        "Authorization": f"Bearer 2QghxPX1vqvEGcQMHjy9H0iQUWlHxPwa3tCtu28nXGYmfYt98MWUJQQJ99BFACYeBjFAArohAAABAZBS2Bhw.B9xEX81xDLMgHUBYMyAuEAhMnQwgAF1Dj4UAUCJRxpGpDJaMqOBzJQQJ99BFACYeBjFAArohAAABAZBSqq6Z",
+        "Authorization": f"Bearer {directline_token}",
         "Content-Type": "application/json"
     }
     data = {
