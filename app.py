@@ -202,7 +202,7 @@ def get_directline_token():
     token_url = "https://defaultceaebaaed1ed4b91aa8383683a9425.13.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr552_hrAssistantSlack/directline/token?api-version=2022-03-01-preview"
     
     response = requests.get(token_url)
-    return response.json()["access_token"]
+    return response.json()
 
 
 # ## Home Menu Display ##
