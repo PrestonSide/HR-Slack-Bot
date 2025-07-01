@@ -228,7 +228,7 @@ def send_copilot_message(text, conversation_id, token, user):
         "Content-Type": "application/json"
     }
     data = {
-        "locale": "en-EN",
+        "locale": "en-US",
         "type": "message",
         "from": {
             "id": user
